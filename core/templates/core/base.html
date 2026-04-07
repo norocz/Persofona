@@ -7,9 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body style="display:flex;flex-direction:column;min-height:100vh;">
 <canvas id="matrix-rain"></canvas>
-<div class="shell">
+<div class="shell" style="flex:1;">
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-head">
       <a href="{% url 'core:dashboard' %}" class="logo">
@@ -81,6 +81,9 @@
     <div class="content">{% block content %}{% endblock %}</div>
   </main>
 </div>
+<footer style="padding:0.6rem 1.5rem;border-top:1px solid rgba(0,255,65,0.15);font-size:0.72rem;color:rgba(0,255,65,0.4);font-family:'JetBrains Mono',monospace;text-align:center;letter-spacing:0.05em;width:100%;box-sizing:border-box;">
+  ⬡ Persofona v1.0 &mdash; {% now "Y" %} &mdash; stvořeno ve tmě Josefem &ldquo;NORO&rdquo; Němcem &mdash; <span style="opacity:0.6" title="žádní agenti nebyli při vývoji zraněni">// kód teče jako déšť</span>
+</footer>
 <script src="{% static 'js/main.js' %}"></script>
 {% block extra_js %}{% endblock %}
 </body></html>

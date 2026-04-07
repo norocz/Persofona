@@ -3,7 +3,7 @@ from django.conf import settings
 def global_context(request):
     ctx = {
         'PERSONDB_THEME': getattr(settings, 'PERSONDB_THEME', 'matrix'),
-        'APP_NAME': 'PersonDB',
+        'APP_NAME': 'Persofona',
     }
     if hasattr(request, 'workspace') and request.workspace:
         ctx['current_workspace'] = request.workspace
