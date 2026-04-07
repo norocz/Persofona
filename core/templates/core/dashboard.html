@@ -1,0 +1,59 @@
+{% extends "core/base.html" %}{% load i18n persondb_tags %}
+{% block title %}{{ APP_NAME }} — {% trans "Dashboard" %}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1 class="glitch" data-text="{% trans 'Dashboard' %}">{% trans "Dashboard" %}</h1>
+  <a href="{% url 'core:person_create' %}" class="btn btn-p">+ {% trans "Nová osoba" %}</a>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-val">{{ total_persons }}</div><div class="stat-lbl">{% trans "Osoby" %}</div><div class="stat-ico">◉</div></div>
+  <div class="stat"><div class="stat-val">{{ total_rels }}</div><div class="stat-lbl">{% trans "Vztahy" %}</div><div class="stat-ico">⬡</div></div>
+  <div class="stat"><div class="stat-val">{{ total_docs }}</div><div class="stat-lbl">{% trans "Dokumenty" %}</div><div class="stat-ico">◇</div></div>
+  <div class="stat"><div class="stat-val">{{ total_tags }}/{{ total_groups }}</div><div class="stat-lbl">{% trans "Štítky/Skupiny" %}</div><div class="stat-ico">◈</div></div>
+</div>
+
+<div class="dash-grid">
+  <div class="panel">
+    <h2 class="panel-t"><span class="pi">⭐</span>{% trans "Oblíbené" %}</h2>
+    <div class="mini-grid">{% for p in favorites %}
+      <a href="{{ p.get_absolute_url }}" class="mini-card">
+        <div class="mini-av">{% if p.photo %}<img src="{{ p.photo.url }}" alt="">{% else %}<span class="av-ph">{{ p.first_name.0 }}{{ p.last_name.0 }}</span>{% endif %}</div>
+        <div class="mini-nm">{{ p.first_name }} {{ p.last_name }}</div>
+      </a>{% empty %}<div class="empty-sm">{% trans "Žádné oblíbené" %}</div>{% endfor %}
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 class="panel-t"><span class="pi">◈</span>{% trans "Nedávno přidané" %}</h2>
+    <div class="recent-list">{% for p in recent %}
+      <a href="{{ p.get_absolute_url }}" class="recent-row">
+        <span>{{ p }}</span><span class="recent-dt">{{ p.created_at|date:"d.m.Y" }}</span>
+      </a>{% empty %}<div class="empty-sm">{% trans "Žádné osoby" %}</div>{% endfor %}
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 class="panel-t"><span class="pi">◇</span>{% trans "Štítky" %}</h2>
+    <div class="tag-cloud">{% for t in tags %}
+      <a href="{% url 'core:tag_detail' pk=t.pk %}" class="tag-b" style="--tc:{{ t.color }}">{{ t.name }}<span class="tag-cnt">{{ t.cnt }}</span></a>
+    {% empty %}<div class="empty-sm">{% trans "Žádné" %}</div>{% endfor %}
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 class="panel-t"><span class="pi">⬢</span>{% trans "Skupiny" %}</h2>
+    <div class="grp-list">{% for g in groups %}
+      <a href="{% url 'core:group_detail' pk=g.pk %}" class="grp-row">
+        <span class="grp-dot" style="background:{{ g.color }}"></span><span>{{ g.name }}</span><span class="grp-cnt">{{ g.cnt }}</span>
+      </a>{% empty %}<div class="empty-sm">{% trans "Žádné" %}</div>{% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="panel panel-full">
+  <h2 class="panel-t"><span class="pi">⬡</span>{% trans "Síť vztahů" %}</h2>
+  <div id="network-graph" class="graph-box"></div>
+</div>
+{% endblock %}
+{% block extra_js %}<script>document.addEventListener('DOMContentLoaded',()=>loadGraph())</script>{% endblock %}

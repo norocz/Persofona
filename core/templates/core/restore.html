@@ -1,0 +1,17 @@
+{% extends "core/base.html" %}{% load i18n %}
+{% block title %}{{ APP_NAME }} — {% trans "Obnovit zálohu" %}{% endblock %}
+{% block content %}
+<div class="page-head"><h1 class="glitch" data-text="{% trans 'Obnovit zálohu' %}">{% trans "Obnovit zálohu" %}</h1></div>
+<div class="panel form-panel">
+  <p class="import-info">{% trans "Nahrajte ZIP soubor vytvořený funkcí Záloha. Obsahuje JSON data i všechny soubory (fotky, dokumenty). Existující záznamy budou aktualizovány podle UUID." %}</p>
+  <form method="post" enctype="multipart/form-data" class="form-matrix">{% csrf_token %}
+    <div class="fg"><label>{% trans "ZIP soubor" %}</label><input type="file" name="file" accept=".zip" required class="form-control">
+      {% if error %}<div class="field-err">{{ error }}</div>{% endif %}
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-p">{% trans "Obnovit" %}</button>
+      <a href="{% url 'core:dashboard' %}" class="btn btn-ghost">{% trans "Zrušit" %}</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

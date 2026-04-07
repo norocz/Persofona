@@ -1,0 +1,14 @@
+{% extends "core/auth/base_auth.html" %}{% load i18n %}
+{% block title %}{{ APP_NAME }} — {% trans "Přihlášení" %}{% endblock %}
+{% block auth_content %}
+<h2 class="auth-title">{% trans "Přihlášení" %}</h2>
+<form method="post" class="form-matrix">{% csrf_token %}
+  <div class="fg"><label>{% trans "Uživatel" %}</label>{{ form.username }}</div>
+  <div class="fg"><label>{% trans "Heslo" %}</label>{{ form.password }}</div>
+  {% if form.errors %}<div class="field-err">{% trans "Neplatné přihlašovací údaje." %}</div>{% endif %}
+  <button type="submit" class="btn btn-p" style="width:100%;margin-top:.5rem">{% trans "Přihlásit se" %}</button>
+</form>
+<div class="auth-footer">
+  {% trans "Nemáte účet?" %} <a href="{% url 'core:register' %}">{% trans "Zaregistrujte se" %}</a>
+</div>
+{% endblock %}

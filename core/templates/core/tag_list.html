@@ -1,0 +1,20 @@
+{% extends "core/base.html" %}{% load i18n %}
+{% block title %}{{ APP_NAME }} — {% trans "Štítky" %}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1 class="glitch" data-text="{% trans 'Štítky' %}">{% trans "Štítky" %}</h1>
+  <a href="{% url 'core:tag_create' %}" class="btn btn-p">+ {% trans "Nový štítek" %}</a>
+</div>
+<div class="card-grid">{% for t in tags %}
+  <div class="item-card">
+    <div class="item-head" style="border-color:{{ t.color }}">
+      <a href="{% url 'core:tag_detail' pk=t.pk %}" class="item-name" style="color:{{ t.color }}">{{ t.icon }} {{ t.name }}</a>
+      <span class="item-cnt">{{ t.cnt }} {% trans "osob" %}</span>
+    </div>
+    <div class="item-acts">
+      <a href="{% url 'core:tag_update' pk=t.pk %}" class="btn btn-sm btn-ghost">{% trans "Upravit" %}</a>
+      <a href="{% url 'core:tag_delete' pk=t.pk %}" class="btn btn-sm btn-d">{% trans "Smazat" %}</a>
+    </div>
+  </div>
+{% empty %}<div class="empty-state"><h3>{% trans "Žádné štítky" %}</h3></div>{% endfor %}</div>
+{% endblock %}

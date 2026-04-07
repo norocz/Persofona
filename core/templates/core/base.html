@@ -1,0 +1,86 @@
+{% load static i18n %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" data-theme="{{ PERSONDB_THEME }}">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}{{ APP_NAME }}{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'css/matrix.css' %}">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+<canvas id="matrix-rain"></canvas>
+<div class="shell">
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <a href="{% url 'core:dashboard' %}" class="logo">
+        <span class="logo-hex">⬡</span><span class="logo-txt">{{ APP_NAME }}</span>
+      </a>
+      {% if current_workspace %}
+      <div class="ws-switcher">
+        <div class="ws-current" onclick="document.getElementById('ws-dropdown').classList.toggle('open')">
+          <span class="ws-dot-sm" style="background:{{ current_workspace.color }}"></span>
+          <span class="ws-cur-name">{{ current_workspace.name }}</span>
+          <span class="ws-arrow">▾</span>
+        </div>
+        <div class="ws-dropdown" id="ws-dropdown">
+          {% for ws in user_workspaces %}
+          <form method="post" action="{% url 'core:workspace_switch' pk=ws.pk %}" class="inline">{% csrf_token %}
+            <button type="submit" class="ws-dd-item {% if ws.pk == current_workspace.pk %}active{% endif %}">
+              <span class="ws-dot-sm" style="background:{{ ws.color }}"></span>{{ ws.name }}
+            </button>
+          </form>
+          {% endfor %}
+          <a href="{% url 'core:workspace_create' %}" class="ws-dd-item ws-dd-new">+ {% trans "Nový prostor" %}</a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    <a href="{% url 'core:person_create' %}" class="nav-add"><span class="nav-add-ico">+</span>{% trans "Přidat osobu" %}</a>
+    <div class="nav-links">
+      <a href="{% url 'core:dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><span class="ni">◈</span>{% trans "Dashboard" %}</a>
+      <a href="{% url 'core:person_list' %}" class="nav-item {% if 'person' in request.resolver_match.url_name and request.resolver_match.url_name != 'person_create' %}active{% endif %}"><span class="ni">◉</span>{% trans "Osoby" %}</a>
+      <a href="{% url 'core:network_map' %}" class="nav-item {% if request.resolver_match.url_name == 'network_map' %}active{% endif %}"><span class="ni">⬡</span>{% trans "Mapa vztahů" %}</a>
+      <a href="{% url 'core:tag_list' %}" class="nav-item {% if 'tag' in request.resolver_match.url_name %}active{% endif %}"><span class="ni">◇</span>{% trans "Štítky" %}</a>
+      <a href="{% url 'core:group_list' %}" class="nav-item {% if 'group' in request.resolver_match.url_name %}active{% endif %}"><span class="ni">⬢</span>{% trans "Skupiny" %}</a>
+    </div>
+    <div class="nav-links nav-sys">
+      <div class="nav-sect">{% trans "Data" %}</div>
+      <a href="{% url 'core:export' %}" class="nav-item"><span class="ni">⇧</span>{% trans "Export JSON" %}</a>
+      <a href="{% url 'core:import_data' %}" class="nav-item"><span class="ni">⇩</span>{% trans "Import JSON" %}</a>
+      <a href="{% url 'core:backup' %}" class="nav-item"><span class="ni">⬇</span>{% trans "Záloha (ZIP)" %}</a>
+      <a href="{% url 'core:restore' %}" class="nav-item"><span class="ni">⬆</span>{% trans "Obnovit (ZIP)" %}</a>
+    </div>
+    <div class="nav-bottom">
+      {% if current_workspace %}
+      <a href="{% url 'core:workspace_settings' %}" class="nav-item {% if 'workspace_settings' in request.resolver_match.url_name %}active{% endif %}"><span class="ni">⚙</span>{% trans "Nastavení" %}</a>
+      {% endif %}
+      {% if user.is_authenticated %}
+      <div class="user-info">
+        <span class="user-name">{{ user.username }}</span>
+        <form method="post" action="{% url 'core:logout' %}" class="inline">{% csrf_token %}
+          <button type="submit" class="btn btn-sm btn-ghost">{% trans "Odhlásit" %}</button>
+        </form>
+      </div>
+      {% endif %}
+      <form action="{% url 'set_language' %}" method="post" class="lang-form">{% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <select name="language" onchange="this.form.submit()" class="lang-sel">
+          {% get_available_languages as LANGS %}{% for code,name in LANGS %}
+          <option value="{{ code }}" {% if code == LANGUAGE_CODE %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
+  </nav>
+  <main class="main">
+    <button class="sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+    {% if messages %}<div class="alerts">{% for m in messages %}
+    <div class="alert alert-{{ m.tags }}" onclick="this.remove()">
+      <span class="ai">{% if m.tags == 'success' %}✓{% elif m.tags == 'error' %}✗{% else %}ℹ{% endif %}</span>{{ m }}
+    </div>{% endfor %}</div>{% endif %}
+    <div class="content">{% block content %}{% endblock %}</div>
+  </main>
+</div>
+<script src="{% static 'js/main.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body></html>

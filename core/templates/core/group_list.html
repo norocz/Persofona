@@ -1,0 +1,21 @@
+{% extends "core/base.html" %}{% load i18n %}
+{% block title %}{{ APP_NAME }} — {% trans "Skupiny" %}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1 class="glitch" data-text="{% trans 'Skupiny' %}">{% trans "Skupiny" %}</h1>
+  <a href="{% url 'core:group_create' %}" class="btn btn-p">+ {% trans "Nová skupina" %}</a>
+</div>
+<div class="card-grid">{% for g in groups %}
+  <div class="item-card">
+    <div class="item-head" style="border-color:{{ g.color }}">
+      <a href="{% url 'core:group_detail' pk=g.pk %}" class="item-name" style="color:{{ g.color }}">{{ g.name }}</a>
+      <span class="item-cnt">{{ g.cnt }} {% trans "členů" %}</span>
+    </div>
+    {% if g.description %}<p class="item-desc">{{ g.description|truncatewords:20 }}</p>{% endif %}
+    <div class="item-acts">
+      <a href="{% url 'core:group_update' pk=g.pk %}" class="btn btn-sm btn-ghost">{% trans "Upravit" %}</a>
+      <a href="{% url 'core:group_delete' pk=g.pk %}" class="btn btn-sm btn-d">{% trans "Smazat" %}</a>
+    </div>
+  </div>
+{% empty %}<div class="empty-state"><h3>{% trans "Žádné skupiny" %}</h3></div>{% endfor %}</div>
+{% endblock %}

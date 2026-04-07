@@ -1,0 +1,17 @@
+{% extends "core/auth/base_auth.html" %}{% load i18n %}
+{% block title %}{{ APP_NAME }} — {% trans "Pozvánka" %}{% endblock %}
+{% block auth_content %}
+<h2 class="auth-title">{% trans "Pozvánka do prostoru" %}</h2>
+<div class="panel" style="text-align:center;margin:1rem 0">
+  <div style="font-size:1.2rem;color:var(--green);font-weight:700">{{ invite.workspace.name }}</div>
+  <div class="muted" style="margin-top:.3rem">{% trans "Role:" %} {{ invite.get_role_display }}</div>
+</div>
+<form method="post" class="form-matrix">{% csrf_token %}
+  {% if user.is_authenticated %}
+    <button type="submit" class="btn btn-p" style="width:100%">{% trans "Připojit se" %}</button>
+  {% else %}
+    <p class="muted">{% trans "Nejprve se přihlaste nebo zaregistrujte." %}</p>
+    <a href="{% url 'core:login' %}" class="btn btn-p" style="width:100%">{% trans "Přihlásit se" %}</a>
+  {% endif %}
+</form>
+{% endblock %}

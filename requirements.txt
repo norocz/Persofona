@@ -1,0 +1,5 @@
+Django>=4.2,<5.1
+Pillow>=10.0
+gunicorn>=21.2
+psycopg2-binary>=2.9
+django-extensions>=3.2

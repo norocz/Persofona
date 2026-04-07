@@ -1,0 +1,24 @@
+{% load static i18n %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" data-theme="{{ PERSONDB_THEME }}">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}{{ APP_NAME }}{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'css/matrix.css' %}">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<canvas id="matrix-rain"></canvas>
+<div class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <span class="logo-hex">⬡</span><span class="logo-txt">{{ APP_NAME }}</span>
+    </div>
+    <div class="logo-sub" style="text-align:center;margin-bottom:1.5rem">{% trans "osobní databáze" %}</div>
+    {% if messages %}<div class="alerts">{% for m in messages %}
+      <div class="alert alert-{{ m.tags }}" onclick="this.remove()">{{ m }}</div>
+    {% endfor %}</div>{% endif %}
+    {% block auth_content %}{% endblock %}
+  </div>
+</div>
+<script src="{% static 'js/main.js' %}"></script>
+</body></html>

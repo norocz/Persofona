@@ -1,0 +1,82 @@
+{% extends "core/base.html" %}{% load i18n %}
+{% block title %}{{ APP_NAME }} — {% trans "Nastavení prostoru" %}{% endblock %}
+{% block content %}
+<div class="page-head"><h1 class="glitch" data-text="{% trans 'Nastavení prostoru' %}">{% trans "Nastavení prostoru" %}</h1></div>
+
+<div class="detail-grid">
+  <div class="panel detail-main">
+    {% if is_owner %}
+    <h3 class="panel-t"><span class="pi">⬡</span>{% trans "Prostor" %}</h3>
+    <form method="post" class="form-matrix">{% csrf_token %}
+      <div class="fg"><label>{{ form.name.label }}</label>{{ form.name }}</div>
+      <div class="fg"><label>{{ form.description.label }}</label>{{ form.description }}</div>
+      <div class="fg"><label>{{ form.color.label }}</label>{{ form.color }}</div>
+      <button type="submit" class="btn btn-p">{% trans "Uložit" %}</button>
+    </form>
+    {% endif %}
+
+    <div class="det-sect" style="margin-top:1.5rem">
+      <h3 class="panel-t"><span class="pi">👥</span>{% trans "Členové" %} ({{ members.count }})</h3>
+      <div class="r-list">{% for m in members %}
+        <div class="r-item">
+          <span class="r-ico">👤</span>
+          <div class="r-info">
+            <span class="r-person">{{ m.user.username }}</span>
+            <span class="r-type">{{ m.get_role_display }}{% if m.user.email %} · {{ m.user.email }}{% endif %}</span>
+          </div>
+          {% if is_owner and m.user != request.user %}
+          <form method="post" action="{% url 'core:member_role' pk=m.pk %}" class="inline" style="display:flex;gap:4px;align-items:center">{% csrf_token %}
+            <select name="role" class="form-control" style="width:auto;padding:2px 6px;font-size:.75rem" onchange="this.form.submit()">
+              <option value="editor" {% if m.role == 'editor' %}selected{% endif %}>Editor</option>
+              <option value="viewer" {% if m.role == 'viewer' %}selected{% endif %}>{% trans "Čtenář" %}</option>
+            </select>
+          </form>
+          <form method="post" action="{% url 'core:member_remove' pk=m.pk %}" class="inline">{% csrf_token %}
+            <button class="btn-x" onclick="return confirm('{% trans "Opravdu?" %}')">✗</button>
+          </form>
+          {% endif %}
+        </div>
+      {% endfor %}</div>
+    </div>
+  </div>
+
+  <div class="detail-side">
+    <div class="panel">
+      <h3 class="panel-t"><span class="pi">🔗</span>{% trans "Pozvánky" %}</h3>
+      {% if is_owner %}
+      <form method="post" action="{% url 'core:invite_create' %}" class="form-matrix" style="margin-bottom:1rem">{% csrf_token %}
+        <div class="fg-row">
+          <div class="fg"><label>{{ invite_form.role.label }}</label>{{ invite_form.role }}</div>
+          <div class="fg"><label>{{ invite_form.max_uses.label }}</label>{{ invite_form.max_uses }}</div>
+        </div>
+        <button type="submit" class="btn btn-p btn-sm">+ {% trans "Vytvořit pozvánku" %}</button>
+      </form>
+      {% endif %}
+
+      <div class="r-list">{% for inv in invites %}
+        <div class="r-item">
+          <div class="r-info">
+            <div class="r-person" style="font-family:var(--font-mono);letter-spacing:2px">{{ inv.code }}</div>
+            <div class="r-type">{{ inv.get_role_display }} · {{ inv.uses }}/{{ inv.max_uses }} · {% if inv.is_valid %}{% trans "aktivní" %}{% else %}{% trans "vypršela" %}{% endif %}</div>
+          </div>
+          <div style="display:flex;gap:4px;align-items:center">
+            <button class="btn btn-sm btn-ghost" onclick="navigator.clipboard.writeText('{{ request.scheme }}://{{ request.get_host }}{% url 'core:join_workspace' code=inv.code %}');this.textContent='✓'" title="{% trans 'Kopírovat odkaz' %}">📋</button>
+            {% if is_owner %}
+            <form method="post" action="{% url 'core:invite_revoke' pk=inv.pk %}" class="inline">{% csrf_token %}
+              <button class="btn-x" title="{% trans 'Zrušit' %}">✗</button>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+      {% empty %}<div class="empty-sm">{% trans "Žádné aktivní pozvánky" %}</div>{% endfor %}</div>
+    </div>
+
+    <div class="panel">
+      <h3 class="panel-t"><span class="pi">💡</span>{% trans "Jak pozvat" %}</h3>
+      <p class="muted" style="font-size:.8rem;line-height:1.5">
+        {% trans "Vytvořte pozvánku a sdílejte kód nebo odkaz. Pozvaný se zaregistruje a automaticky se připojí k tomuto prostoru s vybranou rolí." %}
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

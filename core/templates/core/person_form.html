@@ -1,0 +1,84 @@
+{% extends "core/base.html" %}{% load i18n %}
+{% block title %}{{ APP_NAME }} — {{ title }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1 class="glitch" data-text="{{ title }}">{{ title }}</h1></div>
+<form method="post" enctype="multipart/form-data" class="form-matrix">{% csrf_token %}
+  <div class="form-grid">
+    <div class="panel">
+      <h3 class="panel-t">{% trans "Základní údaje" %}</h3>
+      <div class="fg-row">
+        <div class="fg"><label>{{ form.first_name.label }}</label>{{ form.first_name }}{{ form.first_name.errors }}</div>
+        <div class="fg"><label>{{ form.last_name.label }}</label>{{ form.last_name }}{{ form.last_name.errors }}</div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>{{ form.middle_name.label }}</label>{{ form.middle_name }}</div>
+        <div class="fg"><label>{{ form.nickname.label }}</label>{{ form.nickname }}</div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>{{ form.gender.label }}</label>{{ form.gender }}</div>
+        <div class="fg"><label>{{ form.birth_date.label }}</label>{{ form.birth_date }}</div>
+        <div class="fg"><label>{{ form.death_date.label }}</label>{{ form.death_date }}</div>
+      </div>
+      <div class="fg"><label>{{ form.photo.label }}</label>{{ form.photo }}{{ form.photo.errors }}</div>
+    </div>
+
+    <div class="panel">
+      <h3 class="panel-t">{% trans "Popis" %}</h3>
+      <div class="fg"><label>{{ form.bio.label }}</label>{{ form.bio }}</div>
+      <div class="fg"><label>{{ form.notes.label }}</label>{{ form.notes }}</div>
+    </div>
+
+    <div class="panel">
+      <h3 class="panel-t">{% trans "Adresa & Práce" %}</h3>
+      <div class="fg"><label>{{ form.address_street.label }}</label>{{ form.address_street }}</div>
+      <div class="fg-row">
+        <div class="fg"><label>{{ form.address_city.label }}</label>{{ form.address_city }}</div>
+        <div class="fg"><label>{{ form.address_zip.label }}</label>{{ form.address_zip }}</div>
+        <div class="fg"><label>{{ form.address_country.label }}</label>{{ form.address_country }}</div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>{{ form.company.label }}</label>{{ form.company }}</div>
+        <div class="fg"><label>{{ form.job_title.label }}</label>{{ form.job_title }}</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 class="panel-t">{% trans "Kontakty" %}</h3>
+      {{ contact_formset.management_form }}
+      <div id="contact-forms">{% for cf in contact_formset %}
+        <div class="contact-row">
+          <div class="fg-row">
+            <div class="fg">{{ cf.contact_type }}</div>
+            <div class="fg">{{ cf.label }}</div>
+            <div class="fg">{{ cf.value }}</div>
+            <div class="fg"><label class="cb-label">{{ cf.is_primary }} {% trans "Primární" %}</label></div>
+            {% if cf.instance.pk %}<div class="fg"><label class="cb-label">{{ cf.DELETE }} {% trans "Smazat" %}</label></div>{% endif %}
+          </div>{{ cf.id }}{{ cf.errors }}
+        </div>{% endfor %}
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 class="panel-t">{% trans "Štítky & Skupiny" %}</h3>
+      <div class="fg-row">
+        <div class="fg"><label>{{ form.tags.label }}</label><div class="cb-grid">{{ form.tags }}</div></div>
+        <div class="fg"><label>{{ form.groups.label }}</label><div class="cb-grid">{{ form.groups }}</div></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label class="cb-label">{{ form.is_favorite }} {% trans "Oblíbený" %}</label></div>
+        <div class="fg"><label class="cb-label">{{ form.is_active }} {% trans "Aktivní" %}</label></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 class="panel-t">{% trans "Metadata" %} <span class="json-badge">JSON</span></h3>
+      <div class="fg">{{ form.metadata_json }}{{ form.metadata_json.errors }}<small>{{ form.metadata_json.help_text }}</small></div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-p">{% trans "Uložit" %}</button>
+    <a href="{% url 'core:person_list' %}" class="btn btn-ghost">{% trans "Zrušit" %}</a>
+  </div>
+</form>
+{% endblock %}

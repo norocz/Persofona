@@ -1,0 +1,81 @@
+{% extends "core/base.html" %}{% load i18n static %}
+{% block title %}{{ APP_NAME }} — {% trans "Mapa vztahů" %}{% endblock %}
+
+{% block extra_head %}
+<style>
+.map-container { position: relative; width: 100%; height: calc(100vh - 100px); min-height: 500px; }
+.map-canvas { width: 100%; height: 100%; display: block; background: var(--bg);
+  border: 1px solid var(--border); border-radius: var(--radius); cursor: grab; }
+.map-canvas:active { cursor: grabbing; }
+.map-controls { position: absolute; top: 12px; right: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 10; }
+.map-btn { background: var(--bg-panel); border: 1px solid var(--border); color: var(--green);
+  width: 36px; height: 36px; border-radius: var(--radius); cursor: pointer; font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center; transition: all .15s; }
+.map-btn:hover { background: var(--green-lo); border-color: var(--green-dim); }
+.map-legend { position: absolute; bottom: 12px; left: 12px; background: var(--bg-panel);
+  border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px;
+  z-index: 10; max-width: 280px; max-height: 300px; overflow-y: auto; }
+.map-legend h4 { font-family: var(--font-head); font-size: .65rem; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--green); margin-bottom: 6px; }
+.legend-section { margin-bottom: 8px; }
+.legend-title { font-family: var(--font-mono); font-size: .6rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: .75rem; padding: 2px 0; cursor: pointer; }
+.legend-item:hover { color: var(--green); }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.legend-rect { width: 14px; height: 10px; border-radius: 2px; flex-shrink: 0; opacity: .5; border: 1px dashed; }
+.map-filters { position: absolute; top: 12px; left: 12px; display: flex; gap: 6px; z-index: 10; flex-wrap: wrap; }
+.filter-chip { background: var(--bg-panel); border: 1px solid var(--border); color: var(--muted);
+  padding: 4px 10px; border-radius: 3px; font-size: .72rem; font-weight: 600;
+  cursor: pointer; transition: all .15s; font-family: var(--font-body); }
+.filter-chip:hover, .filter-chip.active { border-color: var(--green-dim); color: var(--green); background: var(--green-lo); }
+.map-tooltip { position: absolute; background: var(--bg-panel); border: 1px solid var(--green-dim);
+  border-radius: var(--radius); padding: 8px 12px; pointer-events: none; z-index: 20;
+  font-size: .78rem; display: none; box-shadow: 0 4px 20px rgba(0,255,65,.1); max-width: 220px; }
+.tt-name { font-weight: 700; color: var(--green); margin-bottom: 2px; }
+.tt-info { color: var(--muted); font-size: .7rem; }
+.tt-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
+.tt-tag { font-size: .6rem; padding: 1px 5px; border-radius: 2px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1 class="glitch" data-text="{% trans 'Mapa vztahů' %}">{% trans "Mapa vztahů" %}</h1>
+  <div class="head-acts">
+    <span class="map-info" style="font-family:var(--font-mono);font-size:.75rem;color:var(--muted)">
+      {{ person_count }} {% trans "osob" %} · {{ rel_count }} {% trans "vztahů" %}
+    </span>
+  </div>
+</div>
+
+<div class="map-container">
+  <canvas id="fullmap" class="map-canvas"></canvas>
+
+  <div class="map-filters" id="map-filters"></div>
+
+  <div class="map-controls">
+    <button class="map-btn" onclick="graphZoom(1.2)" title="Přiblížit">+</button>
+    <button class="map-btn" onclick="graphZoom(0.8)" title="Oddálit">−</button>
+    <button class="map-btn" onclick="graphReset()" title="Reset">⟲</button>
+    <button class="map-btn" onclick="togglePhysics()" title="Fyzika" id="btn-physics">▶</button>
+    <button class="map-btn" onclick="toggleGroups()" title="Skupiny" id="btn-groups">⬢</button>
+    <button class="map-btn" onclick="toggleLabels()" title="Popisky" id="btn-labels">A</button>
+  </div>
+
+  <div class="map-legend" id="map-legend"></div>
+
+  <div class="map-tooltip" id="tooltip">
+    <div class="tt-name" id="tt-name"></div>
+    <div class="tt-info" id="tt-info"></div>
+    <div class="tt-tags" id="tt-tags"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const GRAPH_DATA_URL = '{% url "core:graph_data_full" %}';
+</script>
+<script src="{% static 'js/network_map.js' %}"></script>
+{% endblock %}

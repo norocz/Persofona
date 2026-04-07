@@ -1,0 +1,15 @@
+{% extends "core/auth/base_auth.html" %}{% load i18n %}
+{% block title %}{{ APP_NAME }} — {% trans "Registrace" %}{% endblock %}
+{% block auth_content %}
+<h2 class="auth-title">{% trans "Registrace" %}</h2>
+<form method="post" class="form-matrix">{% csrf_token %}
+  <div class="fg"><label>{% trans "Uživatelské jméno" %}</label>{{ form.username }}{% if form.username.errors %}<div class="field-err">{{ form.username.errors }}</div>{% endif %}</div>
+  <div class="fg"><label>{% trans "E-mail" %}</label>{{ form.email }}</div>
+  <div class="fg"><label>{% trans "Heslo" %}</label>{{ form.password1 }}{% if form.password1.errors %}<div class="field-err">{{ form.password1.errors }}</div>{% endif %}</div>
+  <div class="fg"><label>{% trans "Heslo znovu" %}</label>{{ form.password2 }}{% if form.password2.errors %}<div class="field-err">{{ form.password2.errors }}</div>{% endif %}</div>
+  <button type="submit" class="btn btn-p" style="width:100%;margin-top:.5rem">{% trans "Vytvořit účet" %}</button>
+</form>
+<div class="auth-footer">
+  {% trans "Máte účet?" %} <a href="{% url 'core:login' %}">{% trans "Přihlaste se" %}</a>
+</div>
+{% endblock %}

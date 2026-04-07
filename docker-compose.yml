@@ -1,0 +1,73 @@
+version: "3.9"
+
+services:
+  # ── PostgreSQL (optional, comment out for SQLite) ──
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-persondb}
+      POSTGRES_USER: ${DB_USER:-persondb}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-persondb}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-persondb}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ── Django App ──
+  web:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-change-me-in-production-s3cr3t!}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-False}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      DB_ENGINE: ${DB_ENGINE:-postgresql}
+      DB_NAME: ${DB_NAME:-persondb}
+      DB_USER: ${DB_USER:-persondb}
+      DB_PASSWORD: ${DB_PASSWORD:-persondb}
+      DB_HOST: db
+      DB_PORT: "5432"
+      LANGUAGE_CODE: ${LANGUAGE_CODE:-cs}
+      TIME_ZONE: ${TIME_ZONE:-Europe/Prague}
+      PERSONDB_THEME: ${PERSONDB_THEME:-matrix}
+    volumes:
+      - media_data:/app/media
+      - static_data:/app/staticfiles
+      - sqlite_data:/app/db
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "
+        python manage.py makemigrations core --noinput &&
+        python manage.py migrate --noinput &&
+        python manage.py collectstatic --noinput &&
+        gunicorn persondb.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120
+      "
+
+  # ── Nginx (production reverse proxy) ──
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - media_data:/app/media:ro
+      - static_data:/app/staticfiles:ro
+    depends_on:
+      - web
+
+volumes:
+  pgdata:
+  media_data:
+  static_data:
+  sqlite_data:

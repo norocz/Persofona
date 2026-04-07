@@ -1,0 +1,17 @@
+{% extends "core/base.html" %}{% load i18n %}
+{% block title %}{{ APP_NAME }} — {{ tag.name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div class="breadcrumb"><a href="{% url 'core:tag_list' %}">{% trans "Štítky" %}</a> / <span style="color:{{ tag.color }}">{{ tag.icon }} {{ tag.name }}</span></div>
+  <div class="head-acts">
+    <a href="{% url 'core:tag_update' pk=tag.pk %}" class="btn btn-p btn-sm">{% trans "Upravit" %}</a>
+    <a href="{% url 'core:tag_delete' pk=tag.pk %}" class="btn btn-d btn-sm">{% trans "Smazat" %}</a>
+  </div>
+</div>
+<div class="person-grid">{% for p in persons %}
+  <a href="{{ p.get_absolute_url }}" class="p-card">
+    <div class="p-card-top"><div class="p-avatar">{% if p.photo %}<img src="{{ p.photo.url }}" alt="">{% else %}<span class="av-ph lg">{{ p.first_name.0 }}{{ p.last_name.0 }}</span>{% endif %}</div></div>
+    <div class="p-card-body"><h3 class="p-name">{{ p }}</h3></div><div class="scanline"></div>
+  </a>{% empty %}<div class="empty-state"><h3>{% trans "Žádné osoby s tímto štítkem" %}</h3></div>{% endfor %}
+</div>
+{% endblock %}

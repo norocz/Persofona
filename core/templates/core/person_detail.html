@@ -1,0 +1,86 @@
+{% extends "core/base.html" %}{% load i18n persondb_tags %}
+{% block title %}{{ APP_NAME }} — {{ person }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div class="breadcrumb"><a href="{% url 'core:person_list' %}">{% trans "Osoby" %}</a> / {{ person }}</div>
+  <div class="head-acts">
+    <form action="{% url 'core:toggle_fav' pk=person.pk %}" method="post" class="inline">{% csrf_token %}
+      <button type="submit" class="btn btn-ghost">{% if person.is_favorite %}⭐{% else %}☆{% endif %}</button>
+    </form>
+    <a href="{% url 'core:person_update' pk=person.pk %}" class="btn btn-p">{% trans "Upravit" %}</a>
+    <a href="{% url 'core:person_delete' pk=person.pk %}" class="btn btn-d">{% trans "Smazat" %}</a>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <div class="panel detail-main">
+    <div class="detail-head">
+      <div class="detail-av">{% if person.photo %}<img src="{{ person.photo.url }}" alt="">{% else %}<span class="av-ph xl">{{ person.first_name.0 }}{{ person.last_name.0 }}</span>{% endif %}</div>
+      <div class="detail-id">
+        <h1 class="detail-name">{{ person.full_name }}</h1>
+        {% if person.nickname %}<div class="detail-nick">"{{ person.nickname }}"</div>{% endif %}
+        {% if person.company %}<div class="detail-co">{{ person.job_title }}{% if person.job_title and person.company %} · {% endif %}{{ person.company }}</div>{% endif %}
+        <div class="detail-meta">
+          {% if person.birth_date %}<span class="mi">🎂 {{ person.birth_date|date:"d.m.Y" }}</span>{% endif %}
+          {% if person.death_date %}<span class="mi">✝ {{ person.death_date|date:"d.m.Y" }}</span>{% endif %}
+          <span class="mi">{{ person.get_gender_display }}</span>
+        </div>
+      </div>
+    </div>
+
+    {% if person.bio %}<div class="det-sect"><h3 class="sect-t">{% trans "Biografie" %}</h3><p>{{ person.bio|linebreaksbr }}</p></div>{% endif %}
+    {% if person.notes %}<div class="det-sect"><h3 class="sect-t">{% trans "Poznámky" %}</h3><p>{{ person.notes|linebreaksbr }}</p></div>{% endif %}
+    {% if person.address_street or person.address_city %}<div class="det-sect"><h3 class="sect-t">{% trans "Adresa" %}</h3><p>{{ person.address_street }}<br>{{ person.address_zip }} {{ person.address_city }}<br>{{ person.address_country }}</p></div>{% endif %}
+
+    <div class="det-sect"><h3 class="sect-t">{% trans "Štítky" %}</h3>
+      <div class="tag-cloud">{% for t in person.tags.all %}<a href="{% url 'core:tag_detail' pk=t.pk %}" class="tag-b" style="--tc:{{ t.color }}">{{ t.name }}</a>{% empty %}<span class="muted">{% trans "Žádné" %}</span>{% endfor %}</div>
+    </div>
+    <div class="det-sect"><h3 class="sect-t">{% trans "Skupiny" %}</h3>
+      <div class="tag-cloud">{% for g in person.groups.all %}<a href="{% url 'core:group_detail' pk=g.pk %}" class="tag-b" style="--tc:{{ g.color }}">{{ g.name }}</a>{% empty %}<span class="muted">{% trans "Žádné" %}</span>{% endfor %}</div>
+    </div>
+
+    {% if person.metadata %}<div class="det-sect"><h3 class="sect-t">{% trans "Metadata" %} <span class="json-badge">JSON</span></h3>{{ meta_json|json_pretty }}</div>{% endif %}
+  </div>
+
+  <div class="detail-side">
+    <div class="panel">
+      <h3 class="panel-t"><span class="pi">📱</span>{% trans "Kontakty" %}</h3>
+      <div class="c-list">{% for c in contacts %}
+        <div class="c-item"><span class="c-ico">{{ c.contact_type|contact_icon }}</span>
+          <div class="c-info"><div class="c-val">{{ c.value }}</div><div class="c-lbl">{{ c.get_contact_type_display }}{% if c.label %} · {{ c.label }}{% endif %}</div></div>
+          {% if c.is_primary %}<span class="pri-b">★</span>{% endif %}
+        </div>{% empty %}<div class="empty-sm">{% trans "Žádné kontakty" %}</div>{% endfor %}
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 class="panel-t"><span class="pi">⬡</span>{% trans "Vztahy" %}</h3>
+      <a href="{% url 'core:rel_create' person_pk=person.pk %}" class="btn btn-sm btn-p mb">+ {% trans "Přidat" %}</a>
+      <div class="r-list">
+        {% for r in from_rels %}<div class="r-item">
+          <span class="r-ico">{{ r.relation_type|rel_icon }}</span>
+          <div class="r-info"><a href="{{ r.person_to.get_absolute_url }}" class="r-person">{{ r.person_to }}</a><span class="r-type">{{ r.get_relation_type_display }}</span></div>
+          <form action="{% url 'core:rel_delete' pk=r.pk %}" method="post" class="inline">{% csrf_token %}<button class="btn-x" onclick="return confirm('{% trans "Opravdu?" %}')">✗</button></form>
+        </div>{% endfor %}
+        {% for r in to_rels %}<div class="r-item">
+          <span class="r-ico">{{ r.relation_type|rel_icon }}</span>
+          <div class="r-info"><a href="{{ r.person_from.get_absolute_url }}" class="r-person">{{ r.person_from }}</a><span class="r-type">← {{ r.get_relation_type_display }}</span></div>
+        </div>{% endfor %}
+        {% if not from_rels and not to_rels %}<div class="empty-sm">{% trans "Žádné vztahy" %}</div>{% endif %}
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 class="panel-t"><span class="pi">📎</span>{% trans "Dokumenty" %}</h3>
+      <a href="{% url 'core:doc_create' person_pk=person.pk %}" class="btn btn-sm btn-p mb">+ {% trans "Přidat" %}</a>
+      <div class="d-list">{% for d in documents %}
+        <div class="d-item"><span class="d-ico">{{ d.doc_type|doc_icon }}</span>
+          <div class="d-info"><a href="{{ d.file.url }}" target="_blank" class="d-title">{{ d.title }}</a><span class="d-type">{{ d.get_doc_type_display }} · {{ d.uploaded_at|date:"d.m.Y" }}</span></div>
+          <form action="{% url 'core:doc_delete' pk=d.pk %}" method="post" class="inline">{% csrf_token %}<button class="btn-x" onclick="return confirm('{% trans "Opravdu?" %}')">✗</button></form>
+        </div>{% empty %}<div class="empty-sm">{% trans "Žádné dokumenty" %}</div>{% endfor %}
+      </div>
+      {% for d in documents %}{% if d.is_image %}<div class="doc-prev"><img src="{{ d.file.url }}" alt="{{ d.title }}"></div>{% endif %}{% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

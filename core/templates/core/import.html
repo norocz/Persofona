@@ -1,0 +1,15 @@
+{% extends "core/base.html" %}{% load i18n %}
+{% block title %}{{ APP_NAME }} — {% trans "Import" %}{% endblock %}
+{% block content %}
+<div class="page-head"><h1 class="glitch" data-text="{% trans 'Import JSON' %}">{% trans "Import JSON" %}</h1></div>
+<div class="panel form-panel">
+  <p class="import-info">{% trans "Nahrajte JSON soubor exportovaný z PersonDB. Existující záznamy budou aktualizovány podle UUID." %}</p>
+  <form method="post" enctype="multipart/form-data" class="form-matrix">{% csrf_token %}
+    <div class="fg"><label>{{ form.file.label }}</label>{{ form.file }}{{ form.file.errors }}</div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-p">{% trans "Importovat" %}</button>
+      <a href="{% url 'core:dashboard' %}" class="btn btn-ghost">{% trans "Zrušit" %}</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

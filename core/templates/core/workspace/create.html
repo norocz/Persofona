@@ -1,0 +1,11 @@
+{% extends "core/auth/base_auth.html" %}{% load i18n %}
+{% block title %}{{ APP_NAME }} — {% trans "Nový prostor" %}{% endblock %}
+{% block auth_content %}
+<h2 class="auth-title">{% trans "Vytvořit pracovní prostor" %}</h2>
+<form method="post" class="form-matrix">{% csrf_token %}
+  <div class="fg"><label>{{ form.name.label }}</label>{{ form.name }}</div>
+  <div class="fg"><label>{{ form.description.label }}</label>{{ form.description }}</div>
+  <div class="fg"><label>{{ form.color.label }}</label>{{ form.color }}</div>
+  <button type="submit" class="btn btn-p" style="width:100%;margin-top:.5rem">{% trans "Vytvořit" %}</button>
+</form>
+{% endblock %}

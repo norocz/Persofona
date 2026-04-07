@@ -1,0 +1,42 @@
+{% extends "core/base.html" %}{% load i18n %}
+{% block title %}{{ APP_NAME }} — {% trans "Osoby" %}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1 class="glitch" data-text="{% trans 'Osoby' %}">{% trans "Osoby" %}</h1>
+  <a href="{% url 'core:person_create' %}" class="btn btn-p">+ {% trans "Nová osoba" %}</a>
+</div>
+<div class="search-panel">
+  <form method="get" class="search-form">
+    <div class="search-row">
+      {{ search_form.q }}
+      <div class="filter-grp">{{ search_form.tag }}{{ search_form.group }}
+        <label class="cb-label">{{ search_form.favorites_only }}<span>{% trans "Oblíbené" %}</span></label>
+      </div>
+      <button type="submit" class="btn btn-p btn-sm">{% trans "Hledat" %}</button>
+    </div>
+  </form>
+</div>
+<div class="person-grid">{% for p in persons %}
+  <a href="{{ p.get_absolute_url }}" class="p-card">
+    <div class="p-card-top">
+      {% if p.is_favorite %}<span class="fav-badge">⭐</span>{% endif %}
+      <div class="p-avatar">{% if p.photo %}<img src="{{ p.photo.url }}" alt="">{% else %}<span class="av-ph lg">{{ p.first_name.0 }}{{ p.last_name.0 }}</span>{% endif %}</div>
+    </div>
+    <div class="p-card-body">
+      <h3 class="p-name">{{ p.first_name }} {{ p.last_name }}</h3>
+      {% if p.nickname %}<div class="p-nick">"{{ p.nickname }}"</div>{% endif %}
+      {% if p.company %}<div class="p-company">{{ p.company }}</div>{% endif %}
+      <div class="p-tags">{% for t in p.tags.all %}<span class="tag-sm" style="--tc:{{ t.color }}">{{ t.name }}</span>{% endfor %}</div>
+    </div>
+    <div class="scanline"></div>
+  </a>
+{% empty %}
+  <div class="empty-state"><div class="empty-ico">◉</div><h3>{% trans "Žádné osoby" %}</h3>
+    <a href="{% url 'core:person_create' %}" class="btn btn-p">{% trans "Přidat osobu" %}</a></div>
+{% endfor %}</div>
+{% if page_obj.has_other_pages %}<div class="pager">
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-sm">«</a>{% endif %}
+  <span class="pg-info">{{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-sm">»</a>{% endif %}
+</div>{% endif %}
+{% endblock %}

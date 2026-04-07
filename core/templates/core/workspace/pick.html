@@ -1,0 +1,18 @@
+{% extends "core/auth/base_auth.html" %}{% load i18n %}
+{% block title %}{{ APP_NAME }} — {% trans "Vybrat prostor" %}{% endblock %}
+{% block auth_content %}
+<h2 class="auth-title">{% trans "Vaše pracovní prostory" %}</h2>
+<div class="ws-list">{% for m in memberships %}
+  <form method="post" action="{% url 'core:workspace_switch' pk=m.workspace.pk %}" class="ws-item">{% csrf_token %}
+    <div class="ws-item-info">
+      <span class="ws-dot" style="background:{{ m.workspace.color }}"></span>
+      <div>
+        <div class="ws-name">{{ m.workspace.name }}</div>
+        <div class="ws-role">{{ m.get_role_display }}</div>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-p btn-sm">{% trans "Otevřít" %}</button>
+  </form>
+{% endfor %}</div>
+<a href="{% url 'core:workspace_create' %}" class="btn btn-p" style="width:100%;margin-top:1rem">+ {% trans "Nový prostor" %}</a>
+{% endblock %}
