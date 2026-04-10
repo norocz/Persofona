@@ -7,9 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 {% block extra_head %}{% endblock %}
 </head>
-<body style="display:flex;flex-direction:column;min-height:100vh;">
+<body>
 <canvas id="matrix-rain"></canvas>
-<div class="shell" style="flex:1;">
+<div class="shell">
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-head">
       <a href="{% url 'core:dashboard' %}" class="logo">
@@ -40,6 +40,7 @@
       <a href="{% url 'core:dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><span class="ni">◈</span>{% trans "Dashboard" %}</a>
       <a href="{% url 'core:person_list' %}" class="nav-item {% if 'person' in request.resolver_match.url_name and request.resolver_match.url_name != 'person_create' %}active{% endif %}"><span class="ni">◉</span>{% trans "Osoby" %}</a>
       <a href="{% url 'core:network_map' %}" class="nav-item {% if request.resolver_match.url_name == 'network_map' %}active{% endif %}"><span class="ni">⬡</span>{% trans "Mapa vztahů" %}</a>
+      <a href="{% url 'core:inference' %}" class="nav-item {% if request.resolver_match.url_name == 'inference' %}active{% endif %}"><span class="ni">⚡</span>{% trans "Odvození" %}</a>
       <a href="{% url 'core:tag_list' %}" class="nav-item {% if 'tag' in request.resolver_match.url_name %}active{% endif %}"><span class="ni">◇</span>{% trans "Štítky" %}</a>
       <a href="{% url 'core:group_list' %}" class="nav-item {% if 'group' in request.resolver_match.url_name %}active{% endif %}"><span class="ni">⬢</span>{% trans "Skupiny" %}</a>
     </div>
@@ -81,9 +82,11 @@
     <div class="content">{% block content %}{% endblock %}</div>
   </main>
 </div>
+
 <footer style="padding:0.6rem 1.5rem;border-top:1px solid rgba(0,255,65,0.15);font-size:0.72rem;color:rgba(0,255,65,0.4);font-family:'JetBrains Mono',monospace;text-align:center;letter-spacing:0.05em;width:100%;box-sizing:border-box;">
-  ⬡ Persofona v1.0 &mdash; {% now "Y" %} &mdash; stvořeno ve tmě Josefem &ldquo;NORO&rdquo; Němcem &mdash; <span style="opacity:0.6" title="žádní agenti nebyli při vývoji zraněni">// kód teče jako déšť</span>
+  ⬡ Persofona v1.1 &mdash; {% now "Y" %} &mdash; stvořeno ve tmě Josefem &ldquo;NORO&rdquo; Němcem &mdash; <span style="opacity:0.6" title="žádní agenti nebyli při vývoji zraněni">// kód teče jako déšť</span>
 </footer>
+
 <script src="{% static 'js/main.js' %}"></script>
 {% block extra_js %}{% endblock %}
 </body></html>

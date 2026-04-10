@@ -53,4 +53,8 @@ urlpatterns = [
     path('map/', views.NetworkMapView.as_view(), name='network_map'),
     path('api/graph/', views.NetworkDataView.as_view(), name='graph_data'),
     path('api/graph/full/', views.FullGraphDataView.as_view(), name='graph_data_full'),
+    # Inference
+    path('inference/', views.InferenceSuggestionsView.as_view(), name='inference'),
+    path('inference/apply/', views.InferenceApplyView.as_view(), name='inference_apply'),
+    path('inference/apply-all/', views.InferenceApplyAllView.as_view(), name='inference_apply_all'),
 ]

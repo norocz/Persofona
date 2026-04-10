@@ -18,6 +18,7 @@ from .models import (Person, Contact, Relationship, Document, Tag, Group,
 from .forms import (PersonForm, ContactFormSet, RelationshipForm, DocumentForm,
                      TagForm, GroupForm, SearchForm, ImportForm,
                      RegisterForm, LoginForm, WorkspaceForm, InviteForm)
+from .inference import infer_relationships, apply_suggestion
 
 
 # ==================== Workspace Mixin ====================
@@ -65,7 +66,7 @@ class RegisterView(View):
             ws = Workspace.objects.create(name=_('Moje databáze'), owner=user)
             Membership.objects.create(workspace=ws, user=user, role=Membership.Role.OWNER)
             req.session['workspace_id'] = ws.id
-            messages.success(req, _('Účet vytvořen! Vítejte v PersonDB.'))
+            messages.success(req, _('Účet vytvořen! Vítejte v Persofona.'))
             return redirect('core:dashboard')
         return render(req, 'core/auth/register.html', {'form': form})
 
@@ -277,6 +278,7 @@ class PersonListView(WsMixin, ListView):
             if f.cleaned_data.get('tag'): qs = qs.filter(tags=f.cleaned_data['tag'])
             if f.cleaned_data.get('group'): qs = qs.filter(groups=f.cleaned_data['group'])
             if f.cleaned_data.get('favorites_only'): qs = qs.filter(is_favorite=True)
+        qs = qs.distinct()
         pp = getattr(settings, 'PERSONDB_PER_PAGE', 24)
         pag = Paginator(qs, pp)
         self.page_obj = pag.get_page(self.request.GET.get('page', 1))
@@ -708,3 +710,55 @@ class FullGraphDataView(WsMixin, View):
         edges = [{'from':r['person_from_id'],'to':r['person_to_id'],'type':r['relation_type'],'active':r['is_active']}
                  for r in Relationship.objects.filter(person_from__workspace=ws).values('person_from_id','person_to_id','relation_type','is_active')]
         return JsonResponse({'nodes':nodes,'edges':edges,'tags':all_tags,'groups':all_groups})
+
+# ==================== Relationship Inference ====================
+
+class InferenceSuggestionsView(WsMixin, TemplateView):
+    template_name = 'core/inference.html'
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ws = self.get_ws()
+        ctx['suggestions'] = infer_relationships(ws)
+        return ctx
+
+
+class InferenceApplyView(WsMixin, View):
+    def post(self, req):
+        ws = self.get_ws()
+        from_id = req.POST.get('from_id')
+        to_id = req.POST.get('to_id')
+        rtype = req.POST.get('type')
+        reason = req.POST.get('reason', '')
+
+        if from_id and to_id and rtype:
+            pf = get_object_or_404(Person, pk=from_id, workspace=ws)
+            pt = get_object_or_404(Person, pk=to_id, workspace=ws)
+            rel, created = apply_suggestion(pf, pt, rtype, description=reason)
+            if created:
+                self.log('Vztah odvozen', person=pf,
+                         details={'to': str(pt), 'type': rtype, 'reason': reason})
+                messages.success(req, _('Vztah %(t)s mezi %(a)s a %(b)s vytvořen.') % {
+                    't': rel.get_relation_type_display(), 'a': pf, 'b': pt})
+            else:
+                messages.info(req, _('Tento vztah již existuje.'))
+        return redirect('core:inference')
+
+
+class InferenceApplyAllView(WsMixin, View):
+    def post(self, req):
+        ws = self.get_ws()
+        suggestions = infer_relationships(ws)
+        count = 0
+        for s in suggestions:
+            rel, created = apply_suggestion(
+                s['person_from'], s['person_to'],
+                s['relation_type'], description=s['reason']
+            )
+            if created:
+                count += 1
+        if count:
+            self.log('Hromadné odvození vztahů', details={'count': count})
+            messages.success(req, _('Vytvořeno %(n)s nových vztahů.') % {'n': count})
+        else:
+            messages.info(req, _('Žádné nové vztahy k odvození.'))
+        return redirect('core:inference')

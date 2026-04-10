@@ -55,11 +55,17 @@
   <div class="map-filters" id="map-filters"></div>
 
   <div class="map-controls">
+    <div class="map-modes" id="map-modes">
+      <button class="map-btn mode-btn active" onclick="setLayout('force')" title="Síla" data-mode="force">⚡</button>
+      <button class="map-btn mode-btn" onclick="setLayout('tree')" title="Rodokmen" data-mode="tree">🌳</button>
+      <button class="map-btn mode-btn" onclick="setLayout('radial')" title="Radiální" data-mode="radial">◎</button>
+      <button class="map-btn mode-btn" onclick="setLayout('clusters')" title="Skupiny" data-mode="clusters">⬢</button>
+    </div>
+    <div style="border-top:1px solid var(--border);margin:4px 0"></div>
     <button class="map-btn" onclick="graphZoom(1.2)" title="Přiblížit">+</button>
     <button class="map-btn" onclick="graphZoom(0.8)" title="Oddálit">−</button>
     <button class="map-btn" onclick="graphReset()" title="Reset">⟲</button>
     <button class="map-btn" onclick="togglePhysics()" title="Fyzika" id="btn-physics">▶</button>
-    <button class="map-btn" onclick="toggleGroups()" title="Skupiny" id="btn-groups">⬢</button>
     <button class="map-btn" onclick="toggleLabels()" title="Popisky" id="btn-labels">A</button>
   </div>
 

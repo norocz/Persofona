@@ -1,4 +1,4 @@
-# ⬡ PersonDB
+# ⬡ Persofona 1.1
 
 **Osobní databáze kontaktů** — inspirováno projektem Monica CRM.
 Django aplikace s Matrix/hacker designem, multi-user workspace systémem, JSON metadaty a Docker deployem.

@@ -1,0 +1,57 @@
+{% extends "core/base.html" %}{% load i18n persondb_tags %}
+{% block title %}{{ APP_NAME }} — {% trans "Odvození vztahů" %}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1 class="glitch" data-text="{% trans 'Odvození vztahů' %}">{% trans "Odvození vztahů" %}</h1>
+  <div class="head-acts">
+    {% if suggestions %}
+    <form method="post" action="{% url 'core:inference_apply_all' %}">{% csrf_token %}
+      <button type="submit" class="btn btn-p" onclick="return confirm('{% trans "Vytvořit všechny navržené vztahy?" %}')">
+        {% trans "Přijmout vše" %} ({{ suggestions|length }})
+      </button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+<p class="muted" style="margin-bottom:1rem;font-size:.85rem">
+  {% trans "Systém analyzuje existující vztahy a navrhuje nové na základě pravidel: prarodiče, sourozenci, strýcové/tety, bratranci." %}
+</p>
+
+{% if suggestions %}
+<div class="inference-grid">
+  {% for s in suggestions %}
+  <div class="panel inference-card">
+    <div class="inf-people">
+      <a href="{{ s.person_from.get_absolute_url }}" class="inf-person">
+        <span class="av-ph" style="width:36px;height:36px;border-radius:50%;font-size:.7rem;display:inline-flex">{{ s.person_from.first_name.0 }}{{ s.person_from.last_name.0 }}</span>
+        <span>{{ s.person_from }}</span>
+      </a>
+      <div class="inf-arrow">
+        <span class="inf-type-icon">{{ s.relation_type|rel_icon }}</span>
+        <span class="inf-type-label">{{ s.relation_type }}</span>
+      </div>
+      <a href="{{ s.person_to.get_absolute_url }}" class="inf-person">
+        <span class="av-ph" style="width:36px;height:36px;border-radius:50%;font-size:.7rem;display:inline-flex">{{ s.person_to.first_name.0 }}{{ s.person_to.last_name.0 }}</span>
+        <span>{{ s.person_to }}</span>
+      </a>
+    </div>
+    <div class="inf-reason">{{ s.reason }}</div>
+    <form method="post" action="{% url 'core:inference_apply' %}" class="inf-actions">{% csrf_token %}
+      <input type="hidden" name="from_id" value="{{ s.person_from.pk }}">
+      <input type="hidden" name="to_id" value="{{ s.person_to.pk }}">
+      <input type="hidden" name="type" value="{{ s.relation_type }}">
+      <input type="hidden" name="reason" value="{{ s.reason }}">
+      <button type="submit" class="btn btn-p btn-sm">{% trans "Přijmout" %}</button>
+    </form>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="empty-ico">⬡</div>
+  <h3>{% trans "Žádné nové vztahy k odvození" %}</h3>
+  <p class="muted">{% trans "Přidejte více rodinných vztahů (rodič, dítě) a systém automaticky navrhne prarodiče, sourozence a další." %}</p>
+</div>
+{% endif %}
+{% endblock %}

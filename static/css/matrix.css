@@ -492,3 +492,21 @@ small { font-size: 0.75rem; color: var(--muted); }
   padding: 0.4rem 0; margin-bottom: 0.4rem; border-bottom: 1px solid var(--border);
 }
 .user-name { font-family: var(--font-mono); font-size: 0.75rem; color: var(--green); }
+
+/* ---- Inference Cards ---- */
+.inference-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+.inference-card { padding: 1rem; }
+.inf-people { display: flex; align-items: center; gap: 0.6rem; justify-content: space-between; margin-bottom: 0.6rem; }
+.inf-person { display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; font-weight: 600; color: var(--green); text-decoration: none; }
+.inf-person:hover { color: var(--cyan); }
+.inf-arrow { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; flex-shrink: 0; }
+.inf-type-icon { font-size: 1.2rem; }
+.inf-type-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--muted); text-transform: uppercase; }
+.inf-reason { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.6rem; padding: 0.4rem;
+  background: var(--bg); border-radius: var(--radius); font-family: var(--font-mono); }
+.inf-actions { display: flex; justify-content: flex-end; }
+
+/* ---- Map Mode Buttons ---- */
+.map-modes { display: flex; flex-direction: column; gap: 4px; }
+.mode-btn { font-size: 0.9rem !important; }
+.mode-btn.active { background: var(--green-lo) !important; border-color: var(--green) !important; color: var(--green) !important; }
