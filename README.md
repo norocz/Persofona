@@ -11,11 +11,11 @@ Django aplikace s Matrix/hacker designem, multi-user workspace systémem, JSON m
 - **Workspace** — izolované databáze, přepínání mezi prostory
 - **Kooperace** — pozvánky kódem nebo odkazem, role Owner/Editor/Viewer
 - **Osoby** — jméno, foto, biografie, adresa, firma, vlastní JSON metadata
-- **Vztahy** — 21 typů: rodinné (rodič, dítě, manžel/ka...) i nerodinné (přítel, kolega, nepřítel...)
+- **Vztahy** — 21 typů: rodinné (rodič, dítě, manžel/ka...) i nerodinné (přítel, kolega, nepřítel...), doplněná automatická tvorba vztahů rodiče, prarodiče atd.
 - **Kontakty** — email, telefon, web, sociální sítě
 - **Dokumenty** — fotografie, doklady, smlouvy s náhledem
 - **Štítky & Skupiny** — barevné kategorie
-- **Mapa vztahů** — celostránkový interaktivní graf s clustery skupin
+- **Mapa vztahů** — celostránkový interaktivní graf s clustery skupin, rodokmeny a kruhové grafy
 - **JSON Export/Import** — data ve formátu JSON
 - **ZIP Záloha/Obnova** — kompletní balíček včetně fotek a dokumentů
 - **Lokalizace** — čeština, angličtina, němčina, slovenština (i18n)
